@@ -118,9 +118,9 @@ jobs:
              npm test
             
   scan-frontend:
-    docker:
-      - image: cimg/node:13.8.0
-    steps:
+   docker:
+     - image: cimg/node:13.8.0
+   steps:
       - checkout
       - restore_cache:
           keys: [frontend-deps]
@@ -134,9 +134,9 @@ jobs:
 
 
   scan-backend:
-    docker:
-      - image: cimg/node:13.8.0
-    steps:
+   docker:
+     - image: cimg/node:13.8.0
+   steps:
       - checkout
       - restore_cache:
           keys: [backend-deps]

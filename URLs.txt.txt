@@ -1,0 +1,5 @@
+1-URL1: https://github.com/alaamagdy007/udapeople
+2-URL2: http://udapeople-3781199.s3-website-us-east-1.amazonaws.com
+3-URL3: http://d1g9td1cjt3bjs.cloudfront.net
+4-URL4: ec2-54-174-252-130.compute-1.amazonaws.com
+5-URL5: ec2-54-211-10-114.compute-1.amazonaws.com

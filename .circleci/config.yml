@@ -51,7 +51,7 @@ commands:
             echo "Destroying frontend environment: << parameters.workflow_id >>"
             aws s3 rm s3://udapeople-<< parameters.workflow_id >> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.workflow_id >>
-            
+
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -291,40 +291,40 @@ jobs:
                     
   deploy-backend:
     docker:
+      # Docker image here that supports Ansible
       - image: cimg/base:stable
+      #python:3.9.0-alpine
     steps:
+      # Checkout code from git
       - checkout
-      - install_awscli
+      - install_aws_cli_v2
       - install_ansible
       - install_nodejs
+      # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints:
-            - "8f:a8:c4:6e:18:7f:e2:e0:c9:7b:4a:9c:6f:e3:fd:8f"
+          fingerprints: ["8f:a8:c4:6e:18:7f:e2:e0:c9:7b:4a:9c:6f:e3:fd:8f"]
+      # attach workspace
       - attach_workspace:
+          #at: .
           at: ~/
       - restore_cache:
-          keys: [backend-deps]
+          keys: [backend-build]
       - run:
-          name: Install dependencies
+          name: Package backend
           command: |
             cd backend
-            npm install
-      - run:
-          name: Package Backend
-          command : |
-            cd  backend
             npm run build
-            tar -czf artifact.tar.gz dist/* package*
+            tar -czvf artifact.tar.gz dist/* package*
             cd ..
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
-              
       - run:
           name: Deploy backend
-          command: |
+          command: |     
             export TYPEORM_MIGRATIONS_DIR=./migrations
-            export TYPEORM_ENTITIES=./modules/domain/**/*entity{.ts,.js}
-            export TYPEORM_MIGRATIONS=./migrations/*.js
+            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+            export TYPEORM_MIGRATIONS=./migrations/*.ts 
             cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment

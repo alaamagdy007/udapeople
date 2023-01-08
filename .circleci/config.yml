@@ -64,6 +64,7 @@ commands:
           when: on_fail
           #working_directory: ./backend
           command: |
+            echo ${KVDB_BUCKET}
             SUCCESS=$(curl --insecure  https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
             # Logic for reverting the database state
             if (( $SUCCESS == 1 ));

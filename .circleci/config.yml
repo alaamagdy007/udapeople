@@ -297,7 +297,7 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - install_aws_cli_v2
+      - install_awscli
       - install_ansible
       - install_nodejs
       # Add ssh keys with fingerprint

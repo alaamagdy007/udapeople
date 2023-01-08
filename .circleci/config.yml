@@ -55,7 +55,7 @@ commands:
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
-      Workflow_ID:
+      workflow_id:
         type: string
         default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
@@ -65,7 +65,7 @@ commands:
           #working_directory: ./backend
           command: |
             echo ${KVDB_BUCKET}
-            SUCCESS=$(curl --insecure  https://kvdb.io/Fw4NDEQCUdEsy6sHx8vueX/migration_<< parameters.Workflow_ID >>)
+            SUCCESS=$(curl --insecure  https://kvdb.io/Fw4NDEQCUdEsy6sHx8vueX/migration_<< parameters.workflow_id >>)
             # Logic for reverting the database state
             if (( $SUCCESS == 1 ));
             then
@@ -380,16 +380,16 @@ jobs:
           name: Save old WorkflowID to kvdb.io
           command: |
              export OLD_WORKFLOW_ID=$(aws cloudformation \
-                       list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                       list-exports --query "Exports[?Name==\`workflow_id\`].Value" \
                        --no-paginate --output text)
              echo "Old Workflow ID: $OLD_WORKFLOW_ID"
-             curl https://kvdb.io/${KVDB_BUCKET}/old_workflow_id -d "${OLD_WORKFLOW_ID}"       
+             curl https://kvdb.io/Fw4NDEQCUdEsy6sHx8vueX/old_workflow_id -d "${OLD_WORKFLOW_ID}"       
       - run:
           name: Update cloudfront distribution
           command: |
            aws cloudformation deploy \
            --template-file .circleci/files/cloudfront.yml \
-           --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+           --parameter-overrides workflow_id="${CIRCLE_WORKFLOW_ID:0:7}" \
            --stack-name InitialStack
       - destroy-environment
       - revert-migrations  
@@ -405,7 +405,7 @@ jobs:
             name: Remove old stacks and files
             command: |
               export OLD_WORKFLOW_ID=$(aws cloudformation \
-                        list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                        list-exports --query "Exports[?Name==\`workflow_id\`].Value" \
                         --no-paginate --output text)
               echo "Old Workflow ID: $OLD_WORKFLOW_ID"                     
               

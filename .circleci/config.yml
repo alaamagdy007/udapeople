@@ -291,44 +291,44 @@ jobs:
                     
   deploy-backend:
     docker:
-      # Docker image here that supports Ansible
       - image: cimg/base:stable
-      #python:3.9.0-alpine
     steps:
-      # Checkout code from git
       - checkout
       - install_awscli
       - install_ansible
       - install_nodejs
-      # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["8f:a8:c4:6e:18:7f:e2:e0:c9:7b:4a:9c:6f:e3:fd:8f"]
-      # attach workspace
+          fingerprints:
+            - "8f:a8:c4:6e:18:7f:e2:e0:c9:7b:4a:9c:6f:e3:fd:8f"
       - attach_workspace:
-          #at: .
           at: ~/
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-deps]
       - run:
-          name: Package backend
+          name: Install dependencies
           command: |
             cd backend
+            npm install
+      - run:
+          name: Package Backend
+          command : |
+            cd  backend
             npm run build
-            tar -czvf artifact.tar.gz dist/* package*
+            tar -czf artifact.tar.gz dist/* package*
             cd ..
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+              
       - run:
           name: Deploy backend
-          command: |     
+          command: |
             export TYPEORM_MIGRATIONS_DIR=./migrations
-            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-            export TYPEORM_MIGRATIONS=./migrations/*.ts 
+            export TYPEORM_ENTITIES=./modules/domain/**/*entity{.ts,.js}
+            export TYPEORM_MIGRATIONS=./migrations/*.js
             cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
-      - revert-migrations
+      - revert-migrations 
 
   smoke-test:
     docker:
